@@ -15,7 +15,7 @@ tasks:
       
   - command: |
       echo -n "URL=" > .env
-      echo  $(gp url 8080) >> .env
+      echo  -n $(gp url 8080) >> .env
       echo "/auth" >> .env
       docker-compose up
 

@@ -1,6 +1,8 @@
 tasks:
   - init: |
       ./init.sh
+      wget -L http://dl.opencellsoft.com/current/opencell.war -o opencell.war
+      
       docker-compose pull
   - command: |
       docker-compose up

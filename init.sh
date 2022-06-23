@@ -1,3 +1,5 @@
+#!/bin/sh
+
 export OPENCELL_HOST=${OPENCELL_HOST:-localhost}
 export OPENCELL_PORT=8
 echo ">>> Downloading opencell softwares & docker images"

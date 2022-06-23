@@ -19,7 +19,7 @@ services:
     depends_on:
       - postgres
     environment:
-      KEYCLOAK_URL: https://8080-gitpodio-templatedocker-zbvv42qua2g.ws-eu47.gitpod.io/auth
+      KEYCLOAK_URL: https://8080-ryder05-dockercompose-ldat3qsoc62.ws-eu47.gitpod.io//auth
       PROXY_ADDRESS_FORWARDING: true
       WILDFLY_PROXY_ADDRESS_FORWARDING: true
     ports:

@@ -19,7 +19,7 @@ services:
     depends_on:
       - postgres
     environment:
-      KEYCLOAK_URL: "$URL"
+      KEYCLOAK_URL: "${URL}"
       PROXY_ADDRESS_FORWARDING: true
       WILDFLY_PROXY_ADDRESS_FORWARDING: true
     ports:

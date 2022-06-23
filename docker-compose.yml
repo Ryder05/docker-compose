@@ -1,53 +1,29 @@
-version: '3.8'
-
+version: '2.1'
 services:
-  elasticsearch:
-    image: elasticsearch:7.8.0
-    container_name: es
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres-wildfly
     environment:
-      discovery.type: single-node
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 3
-    networks:
-      - elastic
-  logstash:
-    image: logstash:7.8.0
-    container_name: log
-    environment:
-      discovery.seed_hosts: logstash
-      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
+      POSTGRES_USER: opencell_db_user
+      POSTGRES_PASSWORD: opencell_db_password
+      POSTGRES_DB : opencell_db
+      POSTGRES_PORT : 5432
     volumes:
-      - ./logstash/pipeline/logstash-nginx.config:/usr/share/logstash/pipeline/logstash-nginx.config
-      - ./logstash/nginx.log:/home/nginx.log
-    ports:
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
-      - "5044:5044"
-      - "9600:9600"
+       - ./input-files/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+       - ./input-files/import-postgres.sql:/docker-entrypoint-initdb.d/import-postgres.sql
+
+  opencell:
+    image: opencell/wildfly-opencell:11.0.0
+    container_name: opencell
     depends_on:
-      - elasticsearch
-    networks:
-      - elastic
-    command: logstash -f /usr/share/logstash/pipeline/logstash-nginx.config
-  kibana:
-    image: kibana:7.8.0
-    container_name: kib
+      - postgres
+    environment:
+      KEYCLOAK_URL: https://8080-gitpodio-templatedocker-zbvv42qua2g.ws-eu47.gitpod.io/auth
+      PROXY_ADDRESS_FORWARDING: true
+      WILDFLY_PROXY_ADDRESS_FORWARDING: true
     ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    networks:
-      - elastic
-networks:
-  elastic:
-    driver: bridge
-    # default MTU size in docker-compose is 1500
-    driver_opts:
-      com.docker.network.driver.mtu: 1440
+      - "8080:8080"
+    volumes:
+      - ./input-files/opencell.war:/opt/jboss/wildfly/standalone/deployments/opencell.war
+      - ./input-files/opencell-admin.properties:/opt/jboss/wildfly/standalone/configuration/opencell-admin.properties

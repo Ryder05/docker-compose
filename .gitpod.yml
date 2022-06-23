@@ -8,7 +8,7 @@ tasks:
       wget -L http://dl.opencellsoft.com/current/import-postgres.sql  --output-document input-files/import-postgres.sql
       wget -L http://dl.opencellsoft.com/keycloak/init-user-db.sh  --output-document input-files/init-user-db.sh
       echo "elasticsearch.restUri=" > input-files/opencell-admin.properties
-      chown  1000:1000 opencell-admin.properties
+      chown  1000:1000  input-files/opencell-admin.properties
       echo "Pulling docker images from docker hub"
 
       docker-compose pull

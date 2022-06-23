@@ -1,9 +1,18 @@
 tasks:
   - init: |
-      ./init.sh
-      wget -L http://dl.opencellsoft.com/current/opencell.war -o opencell.war
-      
+      export OPENCELL_HOST=${OPENCELL_HOST:-localhost}
+      export OPENCELL_PORT=8
+      echo ">>> Downloading opencell softwares & docker images"
+      mkdir input-files 
+      wget -L http://dl.opencellsoft.com/current/opencell.war -o input-files/opencell.war
+      wget -L http://dl.opencellsoft.com/current/import-postgres.sql  --output-document input-files/import-postgres.sql
+      wget -L http://dl.opencellsoft.com/keycloak/init-user-db.sh  --output-document input-files/init-user-db.sh
+      echo "elasticsearch.restUri=" > input-files/opencell-admin.properties
+      chown  1000:1000 opencell-admin.properties
+      echo "Pulling docker images from docker hub"
+
       docker-compose pull
+      
   - command: |
       docker-compose up
 

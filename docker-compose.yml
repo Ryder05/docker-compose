@@ -12,6 +12,27 @@ services:
     volumes:
        - ./input-files/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
        - ./input-files/import-postgres.sql:/docker-entrypoint-initdb.d/import-postgres.sql
+  keycloak:
+    image: quay.io/keycloak/keycloak:18.0.1-legacy
+    container_name: KEYCLOAK
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: keycloak
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: 0pence!!
+      PROXY_ADDRESS_FORWARDING: true
+      KEYCLOAK_IMPORT: /realm/import
+    volumes:
+       - ./input-files/opencell.json:/realm/import
+    ports:
+      - "9090:8080"
+    depends_on:
+      - postgres
+
 
   opencell:
     image: opencell/wildfly-opencell:11.0.0
@@ -19,9 +40,7 @@ services:
     depends_on:
       - postgres
     environment:
-      KEYCLOAK_URL: "${URL}"
-      PROXY_ADDRESS_FORWARDING: true
-      WILDFLY_PROXY_ADDRESS_FORWARDING: true
+      KEYCLOAK_URL: https://9090-ryder05-dockercompose-qtkmbf0qze8.ws.gp.osama-che.me/auth
     ports:
       - "8080:8080"
     volumes:

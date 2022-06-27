@@ -1,3 +1,6 @@
+image:
+  file: .gitpod.Dockerfile
+
 tasks:
   - init: |
       export OPENCELL_HOST=${OPENCELL_HOST:-localhost}

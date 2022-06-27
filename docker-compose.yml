@@ -1,6 +1,5 @@
 version: '2.1'
 services:
-
   postgres:
     image: postgres:alpine
     container_name: postgres-wildfly
@@ -32,7 +31,6 @@ services:
       - "9090:8080"
     depends_on:
       - postgres
-
 
   opencell:
     image: opencell/wildfly-opencell:11.0.0

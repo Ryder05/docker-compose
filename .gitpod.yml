@@ -1,14 +1,3 @@
-image:
-  file: .gitpod.Dockerfile
-  
-additionalRepositories:
-  - url: https://bitbucket.org/opencellsoft/opencell-portal/src/12.X/
-    checkoutLocation: ./12.X
-
-workspaceLocation:
-  opencell-core/fullstack.code-workspace
-
-
 tasks:
   - name: Back-End
     init: |
@@ -30,13 +19,6 @@ tasks:
       mvn clean install
       docker-compose up
 
-  - name: Front-End
-    before: cd ../12.X
-    init: |
-      npm install --legacy-peer-deps && npm start dev
-  - name: Open Ports
-    init: 
-      gp ports list
 ports:
 
   - name: Opencell-core

@@ -1,34 +1,80 @@
 image:
   file: .gitpod.Dockerfile
+  
+additionalRepositories:
+  - url: https://bitbucket.org/opencellsoft/opencell-portal/src/12.X/
+    checkoutLocation: ./12.X
+
+workspaceLocation:
+  opencell-core/fullstack.code-workspace
+
 
 tasks:
-  - init: |
-      export OPENCELL_HOST=${OPENCELL_HOST:-localhost}
-      export OPENCELL_PORT=8
+  - name: Back-End
+    init: |
       echo ">>> Downloading opencell softwares & docker images"
       mkdir input-files 
       wget -L http://dl.opencellsoft.com/current/opencell.war --output-document input-files/opencell.war
       wget -L http://dl.opencellsoft.com/current/import-postgres.sql  --output-document input-files/import-postgres.sql
       wget -L http://dl.opencellsoft.com/keycloak/init-user-db.sh  --output-document input-files/init-user-db.sh
+      wget -L https://dl.opencellsoft.com/keycloak/opencell-realm-and-users.json  --output-document input-files/opencell.json
       echo "elasticsearch.restUri=" > input-files/opencell-admin.properties
       sudo chown  1000:1000  input-files/opencell-admin.properties
       echo "Pulling docker images from docker hub"
-
       docker-compose pull
-      
-  - command: |
+
+    command: |
       echo -n "URL=" > .env
-      echo  -n $(gp url 8080) >> .env
-      echo "/auth" >> .env
+      echo  -n $(gp url 9090) >> .env
+      echo "/auth" >> .env 
+      mvn clean install
       docker-compose up
 
-
+  - name: Front-End
+    before: cd ../12.X
+    init: |
+      npm install --legacy-peer-deps && npm start dev
+  - name: Open Ports
+    init: 
+      gp ports list
 ports:
 
-  - port: 8080
-    onOpen: open-preview
+  - name: Opencell-core
+    port: 8080
+    onOpen: Open-preview
+    visibility: public
+    description: Opencell
+    
+  - name: Opencell-portal
+    port: 3000
+    visibility: public
+    description: Opencell-portal
+    
+  - name: Adminer
+    port: 8088
+    onOpen: notify
+    description: Adminer
 
+  - name: Keycloak Server
+    description: Have to be open publicly in order to opencell can authentificate 
+    port: 9090
+    onOpen: open-browser
+    visibility: public
+
+  - name: Keycloak
+    description: Have to be open publicly in order to opencell can authentificate 
+    port: 9090
+    onOpen: open-browser
+    visibility: public
+  - name: Debug-Port 
+    description: Debugging Port
+    port: 8787
+    onOpen: ignore
+    visibility: public
 
 vscode:
   extensions:
-    - ms-azuretools.vscode-docker
+    - vscode.docker
+    - vscode.yaml
+    - vscjava.vscode-java-pack
+    - redhat.java
